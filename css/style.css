@@ -1,0 +1,17 @@
+body {
+    font-family: "fira-code";
+    margin: 0;
+    padding: 0;
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    background: black;
+    color: white;
+    padding: 10px 20px;
+}
+nav a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}

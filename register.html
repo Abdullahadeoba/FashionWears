@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Register | FashionWears</title>
+        <link rel="icon" type="image/png" href="/logo/Fashionwears.png" />
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .register-card {
+      max-width: 450px;
+      width: 100%;
+    }
+    @media (max-width: 576px) {
+      .register-card {
+        padding: 2rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card register-card p-4 shadow-sm">
+      <div class="text-center mb-3">
+        <img src="/logo/Fashionwears.png" width="50" alt="FashionWears" />
+        <h3 class="mt-2">Create an Account</h3>
+      </div>
+      <form id="registerForm">
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="confirmPassword" class="form-label">Confirm Password</label>
+          <input type="password" id="confirmPassword" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Register</button>
+        <p class="text-center mt-3">
+          Already have an account?
+          <a href="login.html">Login</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDh8Rdhos0ua1axx2tOGPG1_NOOOPWIkbg",
+            authDomain: "fashionwears-ee564.firebaseapp.com",
+            projectId: "fashionwears-ee564",
+            storageBucket: "fashionwears-ee564.firebasestorage.app",
+            messagingSenderId: "257520342905",
+            appId: "1:257520342905:web:e8026c7b0da942ccf741a8"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Handle Registration
+        document.getElementById("registerForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            
+            // Get Input Values
+            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            // Password Match Validation
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            // Firebase Registration
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert("Registration successful!");
+                    window.location.href = "login.html";
+                })
+                .catch((error) => {
+                    alert(error.message);
+                });
+        });
+    </script>
+</body>
+</html>

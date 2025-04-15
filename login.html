@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | FashionWears</title>
+  <link rel="icon" type="image/png" href="/logo/Fashionwears.png" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .login-card {
+      max-width: 400px;
+      width: 100%;
+    }
+    @media (max-width: 576px) {
+      .login-card {
+        padding: 2rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card login-card p-4 shadow-sm">
+      <div class="text-center mb-3">
+        <img src="/logo/Fashionwears.png" width="50" alt="FashionWears" />
+        <h3 class="mt-2">Welcome Back</h3>
+      </div>
+      <form id="loginForm">
+        <div class="mb-3">
+          <label for="usernameEmail" class="form-label">Email</label>
+          <input type="email" id="usernameEmail" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+        <p class="text-center mt-3">
+          Don't have an account?
+          <a href="register.html">Register</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDh8Rdhos0ua1axx2tOGPG1_NOOOPWIkbg",
+            authDomain: "fashionwears-ee564.firebaseapp.com",
+            projectId: "fashionwears-ee564",
+            storageBucket: "fashionwears-ee564.firebasestorage.app",
+            messagingSenderId: "257520342905",
+            appId: "1:257520342905:web:e8026c7b0da942ccf741a8"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Handle Login
+        document.getElementById("loginForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            
+            // Get Input Values
+            const usernameOrEmail = document.getElementById("usernameEmail").value;
+            const password = document.getElementById("password").value;
+
+            // Firebase Login
+            signInWithEmailAndPassword(auth, usernameOrEmail, password)
+                .then((userCredential) => {
+                    alert("Login successful!");
+                    window.location.href = "dashboard.html";
+                })
+                .catch((error) => {
+                    alert("Error: " + error.message);
+                });
+        });
+    </script>
+</body>
+</html>
