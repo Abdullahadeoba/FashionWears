@@ -11,6 +11,23 @@
       width: 100%;
       max-width: 400px;
     }
+    .profile-pic {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+      border: 2px solid #ddd;
+      display: block;
+      margin: 0 auto 15px;
+    }
+    #fileInput {
+      display: none;
+    }
+    .preview-container {
+      text-align: center;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 <body>
@@ -21,6 +38,11 @@
         <h3 class="mt-2">Create an Account</h3>
       </div>
       <form id="registerForm">
+        <div class="preview-container">
+          <img id="profilePicPreview" src="https://via.placeholder.com/100" alt="Profile Picture" class="profile-pic">
+          <input type="file" id="fileInput" accept="image/*">
+          <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="document.getElementById('fileInput').click()">Choose Photo</button>
+        </div>
         <div class="mb-3">
           <label class="form-label">Email</label>
           <input type="email" id="email" class="form-control" required />
@@ -43,6 +65,8 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
+    import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDh8Rdhos0ua1axx2tOGPG1_NOOOPWIkbg",
@@ -55,6 +79,20 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const storage = getStorage(app);
+    const db = getFirestore(app);
+
+    // Profile picture preview
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          document.getElementById('profilePicPreview').src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
     document.getElementById("registerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -62,6 +100,8 @@
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
       const confirmPassword = document.getElementById("confirmPassword").value;
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
 
       if (password !== confirmPassword) {
         alert("Passwords do not match.");
@@ -69,9 +109,28 @@
       }
 
       try {
-        await createUserWithEmailAndPassword(auth, email, password);
+        // Create user
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        let photoURL = 'https://via.placeholder.com/100'; // Default profile picture
+        
+        // Upload profile picture if selected
+        if (file) {
+          const storageRef = ref(storage, `profile_pictures/${user.uid}`);
+          await uploadBytes(storageRef, file);
+          photoURL = await getDownloadURL(storageRef);
+        }
+        
+        // Save user data to Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          email: email,
+          photoURL: photoURL,
+          createdAt: new Date()
+        });
+        
         alert("Registration successful!");
-        window.location.href = "login.html";
+        window.location.href = "products.html";
       } catch (error) {
         alert("Error: " + error.message);
       }

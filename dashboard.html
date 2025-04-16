@@ -2,115 +2,222 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" type="image/png" href="/logo/Fashionwears.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | FashionWears</title>
+  <link rel="icon" type="image/png" href="/logo/Fashionwears.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    .hero-section {
+      background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                  url('https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      padding: 100px 0;
+      text-align: center;
+    }
+    .product-card {
+      transition: transform 0.3s;
+      margin-bottom: 20px;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+    .product-img {
+      height: 200px;
+      object-fit: cover;
+    }
+  </style>
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container">
-      <a class="navbar-brand" href="index.html">
-        <img src="/logo/Fashionwears.png" width="40" alt=""> FashionWears
+      <a class="navbar-brand" href="dashboard.html">
+        <img src="/logo/Fashionwears.png" width="40" alt="FashionWears Logo"> FashionWears
       </a>
       <div class="d-flex">
-        <button id="logoutBtn" class="btn btn-danger">Logout</button>
+        <a href="products.html" class="btn btn-outline-light me-2">
+          <i class="fas fa-shopping-bag"></i> Products
+        </a>
+        <button id="logoutBtn" class="btn btn-danger">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
       </div>
     </div>
   </nav>
 
-  <!-- Dashboard Content -->
-  <div class="container mt-5">
-    <div class="card shadow p-4">
-      <div class="text-center">
-        <h2>Welcome, <span id="username">User</span>!</h2>
-        <img id="profilePic" src="uploads/default.jpg" class="rounded-circle img-thumbnail mt-3" width="150" alt="Profile Picture">
-        <input type="file" id="profilePicInput" class="form-control mt-3 mb-2" accept="image/*">
-        <button id="uploadBtn" class="btn btn-primary">Update Profile Picture</button>
-      </div>
-      <hr>
-      <h4>Account Details</h4>
-      <ul class="list-group">
-        <li class="list-group-item"><strong>Email:</strong> <span id="email">email@example.com</span></li>
-        <li class="list-group-item"><strong>Member Since:</strong> <span id="memberSince">2024-01-01</span></li>
-      </ul>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <h1>Welcome to FashionWears</h1>
+      <p class="lead">Your one-stop shop for trendy fashion</p>
     </div>
-  </div>
+  </section>
 
-  <!-- Firebase Scripts -->
+  <!-- About Us Section -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <i class="fas fa-info-circle fa-3x mb-3 text-primary"></i>
+              <h3>Who We Are</h3>
+              <p>FashionWears is a leading online fashion retailer dedicated to bringing you the latest trends at affordable prices.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <i class="fas fa-bullseye fa-3x mb-3 text-primary"></i>
+              <h3>What We Do</h3>
+              <p>We curate high-quality fashion items from around the world and deliver them straight to your doorstep.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <i class="fas fa-tshirt fa-3x mb-3 text-primary"></i>
+              <h3>What We Sell</h3>
+              <p>From casual wear to formal attire, we offer a wide range of clothing, accessories, and footwear for all occasions.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="py-5">
+    <div class="container">
+      <h2 class="text-center mb-5">Featured Products</h2>
+      <div class="row">
+        <!-- Product 1 -->
+        <div class="col-md-4 mb-4">
+          <div class="card product-card h-100">
+            <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                 class="card-img-top product-img" alt="Men's Formal Shirt">
+            <div class="card-body">
+              <h5 class="card-title">Men's Formal Shirt</h5>
+              <p class="card-text">Premium quality cotton shirt for formal occasions.</p>
+              <p class="fw-bold">$39.99</p>
+              <a href="products.html" class="btn btn-primary w-100">Buy Now</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Product 2 -->
+        <div class="col-md-4 mb-4">
+          <div class="card product-card h-100">
+            <img src="https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                 class="card-img-top product-img" alt="Women's Summer Dress">
+            <div class="card-body">
+              <h5 class="card-title">Women's Summer Dress</h5>
+              <p class="card-text">Lightweight and comfortable for sunny days.</p>
+              <p class="fw-bold">$49.99</p>
+              <a href="products.html" class="btn btn-primary w-100">Buy Now</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Product 3 -->
+        <div class="col-md-4 mb-4">
+          <div class="card product-card h-100">
+            <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                 class="card-img-top product-img" alt="Unisex Sneakers">
+            <div class="card-body">
+              <h5 class="card-title">Unisex Sneakers</h5>
+              <p class="card-text">Comfortable and stylish for everyday wear.</p>
+              <p class="fw-bold">$59.99</p>
+              <a href="products.html" class="btn btn-primary w-100">Buy Now</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Product 4 -->
+        <div class="col-md-4 mb-4">
+          <div class="card product-card h-100">
+            <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                 class="card-img-top product-img" alt="Denim Jacket">
+            <div class="card-body">
+              <h5 class="card-title">Denim Jacket</h5>
+              <p class="card-text">Classic denim jacket for a casual look.</p>
+              <p class="fw-bold">$45.99</p>
+              <a href="products.html" class="btn btn-primary w-100">Buy Now</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Product 5 -->
+        <div class="col-md-4 mb-4">
+          <div class="card product-card h-100">
+            <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                 class="card-img-top product-img" alt="Leather Handbag">
+            <div class="card-body">
+              <h5 class="card-title">Leather Handbag</h5>
+              <p class="card-text">Elegant and spacious for daily essentials.</p>
+              <p class="fw-bold">$69.99</p>
+              <a href="products.html" class="btn btn-primary w-100">Buy Now</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Product 6 -->
+        <div class="col-md-4 mb-4">
+          <div class="card product-card h-100">
+            <img src="https://images.unsplash.com/photo-1527719327859-c6ce80353573?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                 class="card-img-top product-img" alt="Sports Watch">
+            <div class="card-body">
+              <h5 class="card-title">Sports Watch</h5>
+              <p class="card-text">Durable and stylish for active lifestyles.</p>
+              <p class="fw-bold">$79.99</p>
+              <a href="products.html" class="btn btn-primary w-100">Buy Now</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container text-center">
+      <p>&copy; 2024 FashionWears. All rights reserved.</p>
+      <div class="social-icons">
+        <a href="#" class="text-white mx-2"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="text-white mx-2"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="text-white mx-2"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Firebase & Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDh8Rdhos0ua1axx2tOGPG1_NOOOPWIkbg",
       authDomain: "fashionwears-ee564.firebaseapp.com",
       projectId: "fashionwears-ee564",
-      storageBucket: "fashionwears-ee564.firebasestorage.app",
+      storageBucket: "fashionwears-ee564.appspot.com",
       messagingSenderId: "257520342905",
       appId: "1:257520342905:web:e8026c7b0da942ccf741a8"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const storage = getStorage(app);
 
-    const profilePicInput = document.getElementById("profilePicInput");
-    const uploadBtn = document.getElementById("uploadBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    // Auth state
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        document.getElementById("username").textContent = user.displayName || "User";
-        document.getElementById("email").textContent = user.email;
-        document.getElementById("memberSince").textContent = new Date(user.metadata.creationTime).toDateString();
-
-        if (user.photoURL) {
-          document.getElementById("profilePic").src = user.photoURL;
-        }
-      } else {
+    // Logout functionality
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => {
         window.location.href = "login.html";
-      }
-    });
-
-    // Upload Profile Picture
-    uploadBtn.addEventListener("click", async () => {
-      const user = auth.currentUser;
-      const file = profilePicInput.files[0];
-
-      if (!user) return alert("You're not logged in.");
-      if (!file) return alert("Please select an image.");
-
-      const storageRef = ref(storage, `profile_pics/${user.uid}.jpg`);
-
-      try {
-        await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
-
-        await updateProfile(user, { photoURL: downloadURL });
-        document.getElementById("profilePic").src = downloadURL;
-
-        // Save to localStorage for use in products.html
-        localStorage.setItem("userPhotoURL", downloadURL);
-        alert("Profile picture updated!");
-
-        // Redirect to products page
-        setTimeout(() => {
-          window.location.href = "products.html";
-        }, 1000);
-      } catch (error) {
-        alert("Error: " + error.message);
-      }
-    });
-
-    // Logout
-    logoutBtn.addEventListener("click", () => {
-      signOut(auth).then(() => window.location.href = "login.html");
+      });
     });
   </script>
 </body>
