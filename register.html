@@ -32,6 +32,33 @@
       color: #dc3545;
       font-size: 0.875rem;
       margin-top: 0.25rem;
+      min-height: 20px;
+    }
+    .is-invalid {
+      border-color: #dc3545 !important;
+    }
+    .btn-loading {
+      position: relative;
+      pointer-events: none;
+    }
+    .btn-loading:after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      border: 4px solid transparent;
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: button-loading-spinner 1s ease infinite;
+    }
+    @keyframes button-loading-spinner {
+      from { transform: rotate(0turn); }
+      to { transform: rotate(1turn); }
     }
   </style>
 </head>
@@ -63,7 +90,7 @@
           <input type="password" id="confirmPassword" class="form-control" required />
           <div id="confirmPasswordError" class="error-message"></div>
         </div>
-        <button type="submit" class="btn btn-primary w-100">Register</button>
+        <button type="submit" class="btn btn-primary w-100" id="submitBtn">Register</button>
         <p class="text-center mt-2">Already have an account? <a href="login.html">Login</a></p>
       </form>
     </div>
@@ -86,18 +113,15 @@
     import { 
       getFirestore, 
       doc, 
-      setDoc,
-      collection,
-      query,
-      where,
-      getDocs
+      setDoc
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDh8Rdhos0ua1axx2tOGPG1_NOOOPWIkbg",
       authDomain: "fashionwears-ee564.firebaseapp.com",
+      databaseURL: "https://fashionwears-ee564-default-rtdb.firebaseio.com",
       projectId: "fashionwears-ee564",
-      storageBucket: "fashionwears-ee564.appspot.com",
+      storageBucket: "fashionwears-ee564.firebasestorage.app",
       messagingSenderId: "257520342905",
       appId: "1:257520342905:web:e8026c7b0da942ccf741a8"
     };
@@ -122,97 +146,135 @@
     document.getElementById("registerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       
-      // Clear previous errors
+      // Clear previous errors and validation states
+      const emailField = document.getElementById("email");
+      const passwordField = document.getElementById("password");
+      const confirmPasswordField = document.getElementById("confirmPassword");
+      const submitBtn = document.getElementById("submitBtn");
+      
+      emailField.classList.remove("is-invalid");
+      passwordField.classList.remove("is-invalid");
+      confirmPasswordField.classList.remove("is-invalid");
+      
       document.getElementById('emailError').textContent = '';
       document.getElementById('passwordError').textContent = '';
       document.getElementById('confirmPasswordError').textContent = '';
 
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const confirmPassword = document.getElementById("confirmPassword").value;
+      const email = emailField.value.trim();
+      const password = passwordField.value;
+      const confirmPassword = confirmPasswordField.value;
       const fileInput = document.getElementById('fileInput');
       const file = fileInput.files[0];
 
-      // Validation
+      // Basic validation
       let isValid = true;
       
-      if (password !== confirmPassword) {
-        document.getElementById('confirmPasswordError').textContent = "Passwords do not match.";
+      if (!email) {
+        emailField.classList.add("is-invalid");
+        document.getElementById('emailError').textContent = "Email is required.";
         isValid = false;
       }
       
       if (password.length < 6) {
+        passwordField.classList.add("is-invalid");
         document.getElementById('passwordError').textContent = "Password must be at least 6 characters.";
+        isValid = false;
+      }
+      
+      if (password !== confirmPassword) {
+        confirmPasswordField.classList.add("is-invalid");
+        document.getElementById('confirmPasswordError').textContent = "Passwords do not match.";
         isValid = false;
       }
       
       if (!isValid) return;
 
       try {
-        // Check if email exists (optional - Firebase will catch this anyway)
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("email", "==", email));
-        const querySnapshot = await getDocs(q);
-        
-        if (!querySnapshot.empty) {
-          throw new Error("This email is already registered.");
-        }
+        // Show loading state
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.textContent = "Registering...";
+        submitBtn.classList.add("btn-loading");
+        submitBtn.disabled = true;
 
-        // Create user
+        // 1. Create user account
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         
-        let photoURL = 'https://via.placeholder.com/100'; // Default profile picture
+        let photoURL = 'https://via.placeholder.com/100'; // Default
         
-        // Upload profile picture if selected
+        // 2. Upload profile picture if selected
         if (file) {
           try {
             const storageRef = ref(storage, `profile_pictures/${user.uid}`);
             await uploadBytes(storageRef, file);
             photoURL = await getDownloadURL(storageRef);
             
-            // Update user profile with photoURL
+            // Update auth profile with photoURL
             await updateProfile(user, { photoURL });
           } catch (uploadError) {
-            console.error("Error uploading profile picture:", uploadError);
-            // Continue with registration even if photo upload fails
+            console.warn("Profile picture upload failed:", uploadError);
+            // Continue registration without failing
           }
         }
         
-        // Save user data to Firestore
+        // 3. Save additional user data to Firestore
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           email: email,
           photoURL: photoURL,
-          createdAt: new Date(),
-          lastLogin: new Date()
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString()
         });
         
-        alert("Registration successful! You can now login.");
+        // Success - redirect to login
+        alert("Registration successful! Please login with your new account.");
         window.location.href = "login.html";
+        exit()
+        
       } catch (error) {
         console.error("Registration error:", error);
         
-        let errorMessage = "Registration failed. Please try again.";
+        // Restore button state
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.textContent = "Register";
+        submitBtn.classList.remove("btn-loading");
+        submitBtn.disabled = false;
         
-        // Handle specific Firebase errors
+        // Handle specific error cases
+        let errorMessage = "Registration failed. Please try again.";
+        let errorField = "emailError";
+        
         if (error.code) {
           switch (error.code) {
             case 'auth/email-already-in-use':
-              errorMessage = "This email is already registered.";
+              errorMessage = "This email is already registered. Please use a different email or login.";
               break;
             case 'auth/invalid-email':
               errorMessage = "Please enter a valid email address.";
               break;
             case 'auth/weak-password':
               errorMessage = "Password should be at least 6 characters.";
+              errorField = "passwordError";
               break;
+            case 'auth/operation-not-allowed':
+              errorMessage = "Email/password accounts are not enabled. Contact support.";
+              break;
+            case 'auth/network-request-failed':
+              errorMessage = "Network error. Please check your internet connection.";
+              break;
+            default:
+              errorMessage = `Registration error: ${error.message}`;
           }
-        } else if (error.message) {
-          errorMessage = error.message;
         }
         
-        document.getElementById('emailError').textContent = errorMessage;
+        // Highlight the problematic field
+        if (errorField === "emailError") {
+          document.getElementById("email").classList.add("is-invalid");
+        } else if (errorField === "passwordError") {
+          document.getElementById("password").classList.add("is-invalid");
+        }
+        
+        document.getElementById(errorField).textContent = errorMessage;
       }
     });
   </script>
