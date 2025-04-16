@@ -28,6 +28,11 @@
       text-align: center;
       margin-bottom: 15px;
     }
+    .error-message {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
   </style>
 </head>
 <body>
@@ -46,14 +51,17 @@
         <div class="mb-3">
           <label class="form-label">Email</label>
           <input type="email" id="email" class="form-control" required />
+          <div id="emailError" class="error-message"></div>
         </div>
         <div class="mb-3">
           <label class="form-label">Password</label>
           <input type="password" id="password" class="form-control" required />
+          <div id="passwordError" class="error-message"></div>
         </div>
         <div class="mb-3">
           <label class="form-label">Confirm Password</label>
           <input type="password" id="confirmPassword" class="form-control" required />
+          <div id="confirmPasswordError" class="error-message"></div>
         </div>
         <button type="submit" class="btn btn-primary w-100">Register</button>
         <p class="text-center mt-2">Already have an account? <a href="login.html">Login</a></p>
@@ -64,9 +72,26 @@
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
-    import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { 
+      getStorage, 
+      ref, 
+      uploadBytes, 
+      getDownloadURL 
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc,
+      collection,
+      query,
+      where,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDh8Rdhos0ua1axx2tOGPG1_NOOOPWIkbg",
@@ -96,6 +121,11 @@
 
     document.getElementById("registerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+      
+      // Clear previous errors
+      document.getElementById('emailError').textContent = '';
+      document.getElementById('passwordError').textContent = '';
+      document.getElementById('confirmPasswordError').textContent = '';
 
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
@@ -103,12 +133,31 @@
       const fileInput = document.getElementById('fileInput');
       const file = fileInput.files[0];
 
+      // Validation
+      let isValid = true;
+      
       if (password !== confirmPassword) {
-        alert("Passwords do not match.");
-        return;
+        document.getElementById('confirmPasswordError').textContent = "Passwords do not match.";
+        isValid = false;
       }
+      
+      if (password.length < 6) {
+        document.getElementById('passwordError').textContent = "Password must be at least 6 characters.";
+        isValid = false;
+      }
+      
+      if (!isValid) return;
 
       try {
+        // Check if email exists (optional - Firebase will catch this anyway)
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("email", "==", email));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          throw new Error("This email is already registered.");
+        }
+
         // Create user
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
@@ -117,22 +166,53 @@
         
         // Upload profile picture if selected
         if (file) {
-          const storageRef = ref(storage, `profile_pictures/${user.uid}`);
-          await uploadBytes(storageRef, file);
-          photoURL = await getDownloadURL(storageRef);
+          try {
+            const storageRef = ref(storage, `profile_pictures/${user.uid}`);
+            await uploadBytes(storageRef, file);
+            photoURL = await getDownloadURL(storageRef);
+            
+            // Update user profile with photoURL
+            await updateProfile(user, { photoURL });
+          } catch (uploadError) {
+            console.error("Error uploading profile picture:", uploadError);
+            // Continue with registration even if photo upload fails
+          }
         }
         
         // Save user data to Firestore
         await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
           email: email,
           photoURL: photoURL,
-          createdAt: new Date()
+          createdAt: new Date(),
+          lastLogin: new Date()
         });
         
-        alert("Registration successful!");
-        window.location.href = "products.html";
+        alert("Registration successful! You can now login.");
+        window.location.href = "login.html";
       } catch (error) {
-        alert("Error: " + error.message);
+        console.error("Registration error:", error);
+        
+        let errorMessage = "Registration failed. Please try again.";
+        
+        // Handle specific Firebase errors
+        if (error.code) {
+          switch (error.code) {
+            case 'auth/email-already-in-use':
+              errorMessage = "This email is already registered.";
+              break;
+            case 'auth/invalid-email':
+              errorMessage = "Please enter a valid email address.";
+              break;
+            case 'auth/weak-password':
+              errorMessage = "Password should be at least 6 characters.";
+              break;
+          }
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        document.getElementById('emailError').textContent = errorMessage;
       }
     });
   </script>
