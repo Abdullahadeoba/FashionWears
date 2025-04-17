@@ -11,23 +11,6 @@
       width: 100%;
       max-width: 400px;
     }
-    .profile-pic {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      cursor: pointer;
-      border: 2px solid #ddd;
-      display: block;
-      margin: 0 auto 15px;
-    }
-    #fileInput {
-      display: none;
-    }
-    .preview-container {
-      text-align: center;
-      margin-bottom: 15px;
-    }
     .error-message {
       color: #dc3545;
       font-size: 0.875rem;
@@ -70,11 +53,6 @@
         <h3 class="mt-2">Create an Account</h3>
       </div>
       <form id="registerForm">
-        <div class="preview-container">
-          <img id="profilePicPreview" src="https://via.placeholder.com/100" alt="Profile Picture" class="profile-pic">
-          <input type="file" id="fileInput" accept="image/*">
-          <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="document.getElementById('fileInput').click()">Choose Photo</button>
-        </div>
         <div class="mb-3">
           <label class="form-label">Email</label>
           <input type="email" id="email" class="form-control" required />
@@ -99,22 +77,8 @@
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { 
-      getAuth, 
-      createUserWithEmailAndPassword,
-      updateProfile
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { 
-      getStorage, 
-      ref, 
-      uploadBytes, 
-      getDownloadURL 
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
-    import { 
-      getFirestore, 
-      doc, 
-      setDoc
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDh8Rdhos0ua1axx2tOGPG1_NOOOPWIkbg",
@@ -128,30 +92,16 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const storage = getStorage(app);
     const db = getFirestore(app);
-
-    // Profile picture preview
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          document.getElementById('profilePicPreview').src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
 
     document.getElementById("registerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      
-      // Clear previous errors and validation states
+
       const emailField = document.getElementById("email");
       const passwordField = document.getElementById("password");
       const confirmPasswordField = document.getElementById("confirmPassword");
       const submitBtn = document.getElementById("submitBtn");
-      
+
       emailField.classList.remove("is-invalid");
       passwordField.classList.remove("is-invalid");
       confirmPasswordField.classList.remove("is-invalid");
@@ -163,91 +113,60 @@
       const email = emailField.value.trim();
       const password = passwordField.value;
       const confirmPassword = confirmPasswordField.value;
-      const fileInput = document.getElementById('fileInput');
-      const file = fileInput.files[0];
 
-      // Basic validation
       let isValid = true;
-      
+
       if (!email) {
         emailField.classList.add("is-invalid");
         document.getElementById('emailError').textContent = "Email is required.";
         isValid = false;
       }
-      
+
       if (password.length < 6) {
         passwordField.classList.add("is-invalid");
         document.getElementById('passwordError').textContent = "Password must be at least 6 characters.";
         isValid = false;
       }
-      
+
       if (password !== confirmPassword) {
         confirmPasswordField.classList.add("is-invalid");
         document.getElementById('confirmPasswordError').textContent = "Passwords do not match.";
         isValid = false;
       }
-      
+
       if (!isValid) return;
 
       try {
-        // Show loading state
-        const originalBtnText = submitBtn.textContent;
         submitBtn.textContent = "Registering...";
         submitBtn.classList.add("btn-loading");
         submitBtn.disabled = true;
 
-        // 1. Create user account
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        
-        let photoURL = 'https://via.placeholder.com/100'; // Default
-        
-        // 2. Upload profile picture if selected
-        if (file) {
-          try {
-            const storageRef = ref(storage, `profile_pictures/${user.uid}`);
-            await uploadBytes(storageRef, file);
-            photoURL = await getDownloadURL(storageRef);
-            
-            // Update auth profile with photoURL
-            await updateProfile(user, { photoURL });
-          } catch (uploadError) {
-            console.warn("Profile picture upload failed:", uploadError);
-            // Continue registration without failing
-          }
-        }
-        
-        // 3. Save additional user data to Firestore
+
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           email: email,
-          photoURL: photoURL,
           createdAt: new Date().toISOString(),
           lastLogin: new Date().toISOString()
         });
-        
-        // Success - redirect to login
-        alert("Registration successful! Please login with your new account.");
+
+        alert("Registration successful! Please login.");
         window.location.href = "login.html";
-        exit()
         
       } catch (error) {
         console.error("Registration error:", error);
-        
-        // Restore button state
-        const submitBtn = document.getElementById("submitBtn");
         submitBtn.textContent = "Register";
         submitBtn.classList.remove("btn-loading");
         submitBtn.disabled = false;
-        
-        // Handle specific error cases
+
         let errorMessage = "Registration failed. Please try again.";
         let errorField = "emailError";
-        
+
         if (error.code) {
           switch (error.code) {
             case 'auth/email-already-in-use':
-              errorMessage = "This email is already registered. Please use a different email or login.";
+              errorMessage = "This email is already registered.";
               break;
             case 'auth/invalid-email':
               errorMessage = "Please enter a valid email address.";
@@ -256,24 +175,20 @@
               errorMessage = "Password should be at least 6 characters.";
               errorField = "passwordError";
               break;
-            case 'auth/operation-not-allowed':
-              errorMessage = "Email/password accounts are not enabled. Contact support.";
-              break;
             case 'auth/network-request-failed':
-              errorMessage = "Network error. Please check your internet connection.";
+              errorMessage = "Check your internet connection.";
               break;
             default:
-              errorMessage = `Registration error: ${error.message}`;
+              errorMessage = error.message;
           }
         }
-        
-        // Highlight the problematic field
+
         if (errorField === "emailError") {
-          document.getElementById("email").classList.add("is-invalid");
+          emailField.classList.add("is-invalid");
         } else if (errorField === "passwordError") {
-          document.getElementById("password").classList.add("is-invalid");
+          passwordField.classList.add("is-invalid");
         }
-        
+
         document.getElementById(errorField).textContent = errorMessage;
       }
     });
