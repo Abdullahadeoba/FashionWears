@@ -8,7 +8,112 @@
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary-color: #6c63ff;
+      --secondary-color: #4d44db;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .navbar {
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .hero-section {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      padding: 5rem 0;
+      color: white;
+      margin-bottom: 3rem;
+    }
+    
+    .product-card {
+      transition: all 0.3s ease;
+      border: none;
+      overflow: hidden;
+    }
+    
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .product-img {
+      height: 250px;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .product-card:hover .product-img {
+      transform: scale(1.05);
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      border-color: var(--secondary-color);
+    }
+    
+    .btn-outline-primary {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .btn-outline-primary:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .filter-buttons .btn {
+      margin: 0.2rem;
+    }
+    
+    @media (max-width: 768px) {
+      .filter-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .product-img {
+        height: 200px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .hero-section {
+        padding: 3rem 0;
+      }
+      
+      .product-img {
+        height: 180px;
+      }
+    }
+    
+    .loading-spinner {
+      display: inline-block;
+      width: 2rem;
+      height: 2rem;
+      border: 0.25em solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spinner-border 0.75s linear infinite;
+    }
+    
+    @keyframes spinner-border {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -39,93 +144,184 @@
 
     async function fetchProducts(category = "all") {
       const productsContainer = document.getElementById("productsContainer");
+      productsContainer.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <div class="loading-spinner text-primary"></div>
+          <p class="mt-2">Loading products...</p>
+        </div>
+      `;
 
-      // Simulated product data
-      const dummyProducts = [
+      // Real product data with high-quality images from Unsplash
+      const products = [
+        // Men's Wear
         {
           name: "Classic Men's Shirt",
-          description: "Elegant cotton shirt for everyday use.",
-          image: "https://via.placeholder.com/200x200?text=Mens+Shirt",
-          price: 25,
+          description: "Premium cotton shirt for formal occasions",
+          image: "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 39.99,
           category: "mens",
+          rating: 4.5
         },
         {
-          name: "Women's Casual Dress",
-          description: "Floral print perfect for outings.",
-          image: "https://via.placeholder.com/200x200?text=Womens+Dress",
-          price: 35,
+          name: "Men's Slim Fit Jeans",
+          description: "Comfortable denim jeans with modern fit",
+          image: "https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 49.99,
+          category: "mens",
+          rating: 4.7
+        },
+        {
+          name: "Men's Leather Jacket",
+          description: "Stylish genuine leather jacket",
+          image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 129.99,
+          category: "mens",
+          rating: 4.8
+        },
+        {
+          name: "Men's Running Shoes",
+          description: "Lightweight athletic shoes for running",
+          image: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 79.99,
+          category: "mens",
+          rating: 4.6
+        },
+        
+        // Women's Wear
+        {
+          name: "Women's Summer Dress",
+          description: "Lightweight floral dress perfect for summer",
+          image: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 45.99,
           category: "womens",
+          rating: 4.4
         },
         {
-          name: "Kid's Hoodie",
-          description: "Warm and colorful hoodie for kids.",
-          image: "https://via.placeholder.com/200x200?text=Kids+Hoodie",
-          price: 20,
+          name: "Women's High-Waist Jeans",
+          description: "Trendy high-waist jeans with stretch",
+          image: "https://images.unsplash.com/photo-1583744946564-b52d01e2da64?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 54.99,
+          category: "womens",
+          rating: 4.5
+        },
+        {
+          name: "Women's Leather Handbag",
+          description: "Elegant handbag with multiple compartments",
+          image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 89.99,
+          category: "womens",
+          rating: 4.7
+        },
+        {
+          name: "Women's High Heels",
+          description: "Classic pumps for formal occasions",
+          image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 65.99,
+          category: "womens",
+          rating: 4.3
+        },
+        
+        // Kids' Wear
+        {
+          name: "Kids' Graphic T-Shirt",
+          description: "Comfortable cotton tee with fun prints",
+          image: "https://images.unsplash.com/photo-1609505848912-b7c3b8b4beda?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 19.99,
           category: "kids",
+          rating: 4.2
         },
         {
-          name: "Men's Sneakers",
-          description: "Trendy and comfortable sneakers.",
-          image: "https://via.placeholder.com/200x200?text=Mens+Sneakers",
-          price: 50,
-          category: "mens",
-        },
-        {
-          name: "Women's Handbag",
-          description: "Stylish handbag for everyday use.",
-          image: "https://via.placeholder.com/200x200?text=Womens+Handbag",
-          price: 45,
-          category: "womens",
-        },
-        {
-          name: "Kid's T-Shirt",
-          description: "Soft cotton shirt for kids.",
-          image: "https://via.placeholder.com/200x200?text=Kids+T-Shirt",
-          price: 15,
+          name: "Kids' Denim Jacket",
+          description: "Durable denim jacket for boys and girls",
+          image: "https://images.unsplash.com/photo-1604911181398-3eaf14a8e238?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 34.99,
           category: "kids",
+          rating: 4.5
         },
         {
-          name: "Men's Jeans",
-          description: "Rugged and stylish jeans for all-day wear.",
-          image: "https://via.placeholder.com/200x200?text=Mens+Jeans",
-          price: 40,
-          category: "mens",
+          name: "Kids' Sneakers",
+          description: "Colorful sneakers with velcro straps",
+          image: "https://images.unsplash.com/photo-1543503103-f94a0036ed9d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 29.99,
+          category: "kids",
+          rating: 4.6
         },
         {
-          name: "Women's Heels",
-          description: "Elegant heels for special occasions.",
-          image: "https://via.placeholder.com/200x200?text=Womens+Heels",
-          price: 60,
-          category: "womens",
-        },
+          name: "Kids' Winter Coat",
+          description: "Warm puffer jacket for cold weather",
+          image: "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          price: 44.99,
+          category: "kids",
+          rating: 4.7
+        }
       ];
 
-      productsContainer.innerHTML = "<p>Loading products...</p>";
+      // Simulate network delay for demo
+      setTimeout(() => {
+        let productsHTML = "";
+        const filteredProducts = category === "all" 
+          ? products 
+          : products.filter(p => p.category === category);
 
-      let productsHTML = "";
-
-      dummyProducts.forEach((product) => {
-        if (category === "all" || product.category === category) {
-          productsHTML += `
-            <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
-              <div class="card h-100 shadow-sm">
-                <img src="${product.image}" class="card-img-top" alt="${product.name}" />
-                <div class="card-body d-flex flex-column">
-                  <h5 class="card-title">${product.name}</h5>
-                  <p class="card-text">${product.description}</p>
-                  <p class="fw-bold text-primary">$${product.price}</p>
-                  <button class="btn btn-success mt-auto">Buy Now</button>
-                </div>
-              </div>
+        if (filteredProducts.length === 0) {
+          productsHTML = `
+            <div class="col-12 text-center py-5">
+              <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+              <h4>No products found in this category</h4>
+              <p>Try another category or check back later</p>
             </div>
           `;
+        } else {
+          filteredProducts.forEach((product) => {
+            productsHTML += `
+              <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="card product-card h-100">
+                  <div class="overflow-hidden" style="height: 250px;">
+                    <img src="${product.image}" class="product-img w-100" alt="${product.name}" loading="lazy" />
+                  </div>
+                  <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">${product.name}</h5>
+                    <div class="mb-2">
+                      ${Array(Math.floor(product.rating)).fill('<i class="fas fa-star text-warning"></i>').join('')}
+                      ${product.rating % 1 ? '<i class="fas fa-star-half-alt text-warning"></i>' : ''}
+                      ${Array(5 - Math.ceil(product.rating)).fill('<i class="far fa-star text-warning"></i>').join('')}
+                      <span class="small text-muted ms-1">${product.rating}</span>
+                    </div>
+                    <p class="card-text flex-grow-1">${product.description}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                      <h5 class="text-primary mb-0">$${product.price.toFixed(2)}</h5>
+                      <button class="btn btn-primary">
+                        <i class="fas fa-shopping-cart me-1"></i> Buy Now
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
         }
-      });
 
-      productsContainer.innerHTML = productsHTML || "<p>No products found.</p>";
+        productsContainer.innerHTML = productsHTML;
+        
+        // Add click event to all Buy Now buttons
+        document.querySelectorAll('.btn-primary').forEach(button => {
+          button.addEventListener('click', () => {
+            window.location.href = 'checkout.html';
+          });
+        });
+      }, 800); // End of setTimeout
     }
 
     window.filterProducts = function (category) {
+      // Update active button state
+      document.querySelectorAll('.filter-buttons .btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.toLowerCase().includes(category) || 
+            (category === 'all' && btn.textContent === 'All')) {
+          btn.classList.add('active');
+        }
+      });
+      
       fetchProducts(category);
     };
   </script>
@@ -142,13 +338,15 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
-        <div class="d-flex flex-wrap gap-2">
-          <button class="btn btn-outline-primary" onclick="filterProducts('all')">All</button>
-          <button class="btn btn-outline-primary" onclick="filterProducts('mens')">Men's Wear</button>
-          <button class="btn btn-outline-primary" onclick="filterProducts('womens')">Women's Wear</button>
-          <button class="btn btn-outline-primary" onclick="filterProducts('kids')">Kids' Wear</button>
-          <a href="dashboard.html" class="btn btn-warning">Dashboard</a>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <div class="d-flex flex-wrap gap-2 filter-buttons ms-auto my-2 my-lg-0">
+          <button class="btn btn-outline-light active" onclick="filterProducts('all')">All</button>
+          <button class="btn btn-outline-light" onclick="filterProducts('mens')">Men's Wear</button>
+          <button class="btn btn-outline-light" onclick="filterProducts('womens')">Women's Wear</button>
+          <button class="btn btn-outline-light" onclick="filterProducts('kids')">Kids' Wear</button>
+          <a href="dashboard.html" class="btn btn-warning ms-lg-3">
+            <i class="fas fa-user-circle me-1"></i> Dashboard
+          </a>
         </div>
       </div>
     </div>
@@ -157,22 +355,70 @@
   <!-- Padding for fixed navbar -->
   <div style="padding-top: 80px;"></div>
 
-  <!-- Hero -->
-  <header class="bg-primary text-white text-center py-5">
-    <h1>Discover the Latest Fashion Trends</h1>
-    <p>Shop the best collection of men's, women's, and kids' fashion at affordable prices.</p>
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="container text-center">
+      <h1 class="display-4 fw-bold mb-3">Discover the Latest Fashion Trends</h1>
+      <p class="lead mb-4">Shop our premium collection of clothing and accessories for the whole family</p>
+      <div class="d-flex justify-content-center gap-3">
+        <button class="btn btn-light btn-lg px-4" onclick="filterProducts('mens')">Shop Men</button>
+        <button class="btn btn-outline-light btn-lg px-4" onclick="filterProducts('womens')">Shop Women</button>
+      </div>
+    </div>
   </header>
 
   <!-- Products Section -->
-  <div class="container">
+  <div class="container mb-5">
     <div class="row" id="productsContainer">
       <!-- Products will be dynamically loaded here -->
     </div>
   </div>
 
   <!-- Footer -->
-  <footer class="bg-dark text-white text-center py-3 mt-5">
-    <p>&copy; 2025 FashionWears. All Rights Reserved.</p>
+  <footer class="bg-dark text-white py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-4 mb-md-0">
+          <h5>FashionWears</h5>
+          <p>Your one-stop shop for trendy and affordable fashion for the whole family.</p>
+          <div class="social-icons">
+            <a href="#" class="text-white me-2"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <div class="col-md-2 mb-4 mb-md-0">
+          <h5>Shop</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-white-50" onclick="filterProducts('mens')">Men</a></li>
+            <li><a href="#" class="text-white-50" onclick="filterProducts('womens')">Women</a></li>
+            <li><a href="#" class="text-white-50" onclick="filterProducts('kids')">Kids</a></li>
+            <li><a href="#" class="text-white-50">New Arrivals</a></li>
+          </ul>
+        </div>
+        <div class="col-md-2 mb-4 mb-md-0">
+          <h5>Help</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-white-50">Contact Us</a></li>
+            <li><a href="#" class="text-white-50">FAQs</a></li>
+            <li><a href="#" class="text-white-50">Shipping</a></li>
+            <li><a href="#" class="text-white-50">Returns</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h5>Newsletter</h5>
+          <p>Subscribe to get updates on new arrivals and special offers.</p>
+          <div class="input-group mb-3">
+            <input type="email" class="form-control" placeholder="Your email">
+            <button class="btn btn-primary" type="button">Subscribe</button>
+          </div>
+        </div>
+      </div>
+      <hr class="my-4">
+      <div class="text-center">
+        <p class="mb-0">&copy; 2025 FashionWears. All Rights Reserved.</p>
+      </div>
+    </div>
   </footer>
 
   <!-- Bootstrap JS -->
