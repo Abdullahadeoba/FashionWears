@@ -39,13 +39,72 @@
 
     async function fetchProducts(category = "all") {
       const productsContainer = document.getElementById("productsContainer");
+
+      // Simulated product data
+      const dummyProducts = [
+        {
+          name: "Classic Men's Shirt",
+          description: "Elegant cotton shirt for everyday use.",
+          image: "https://via.placeholder.com/200x200?text=Mens+Shirt",
+          price: 25,
+          category: "mens",
+        },
+        {
+          name: "Women's Casual Dress",
+          description: "Floral print perfect for outings.",
+          image: "https://via.placeholder.com/200x200?text=Womens+Dress",
+          price: 35,
+          category: "womens",
+        },
+        {
+          name: "Kid's Hoodie",
+          description: "Warm and colorful hoodie for kids.",
+          image: "https://via.placeholder.com/200x200?text=Kids+Hoodie",
+          price: 20,
+          category: "kids",
+        },
+        {
+          name: "Men's Sneakers",
+          description: "Trendy and comfortable sneakers.",
+          image: "https://via.placeholder.com/200x200?text=Mens+Sneakers",
+          price: 50,
+          category: "mens",
+        },
+        {
+          name: "Women's Handbag",
+          description: "Stylish handbag for everyday use.",
+          image: "https://via.placeholder.com/200x200?text=Womens+Handbag",
+          price: 45,
+          category: "womens",
+        },
+        {
+          name: "Kid's T-Shirt",
+          description: "Soft cotton shirt for kids.",
+          image: "https://via.placeholder.com/200x200?text=Kids+T-Shirt",
+          price: 15,
+          category: "kids",
+        },
+        {
+          name: "Men's Jeans",
+          description: "Rugged and stylish jeans for all-day wear.",
+          image: "https://via.placeholder.com/200x200?text=Mens+Jeans",
+          price: 40,
+          category: "mens",
+        },
+        {
+          name: "Women's Heels",
+          description: "Elegant heels for special occasions.",
+          image: "https://via.placeholder.com/200x200?text=Womens+Heels",
+          price: 60,
+          category: "womens",
+        },
+      ];
+
       productsContainer.innerHTML = "<p>Loading products...</p>";
 
-      const querySnapshot = await getDocs(collection(db, "products"));
       let productsHTML = "";
 
-      querySnapshot.forEach((doc) => {
-        const product = doc.data();
+      dummyProducts.forEach((product) => {
         if (category === "all" || product.category === category) {
           productsHTML += `
             <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
